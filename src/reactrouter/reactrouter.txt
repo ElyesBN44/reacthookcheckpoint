@@ -1,0 +1,415 @@
+/* Import statements */
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+/* App is the entry point to the React code.*/
+import App from './App';
+
+/* import BrowserRouter from 'react-router-dom' */
+import { BrowserRouter } from 'react-router-dom';
+
+ReactDOM.render(
+    <BrowserRouter>
+        <App />
+    </BrowserRouter>
+    , document.getElementById('root'));
+
+            /////////////////////////Demo 1: Basic Routing//////////////////////////////////
+We’ve covered everything you need to know in order to create a basic router. Let’s try and build one:
+
+src/App.js
+import {Routes, Route, Link } from "react-router-dom";
+import "./styles.css";
+
+/* Home component */
+const Home = () => (
+ <div>
+   <h2>Home</h2>
+ </div>
+);
+
+/* Category component */
+const Category = () => (
+ <div>
+   <h2>Category</h2>
+ </div>
+);
+
+/* Products component */
+const Products = () => (
+ <div>
+   <h2>Products</h2>
+ </div>
+);
+
+/* App component */
+const App = () => {
+ return (
+   <>
+     <div>
+       <nav className="navbar navbar-light">
+         <ul className="nav navbar-nav">
+           {/*  Link components are used for linking to other views */}
+           <li>
+             {" "}
+             <Link to="/">Homes</Link>
+           </li>
+           <li>
+             <Link to="/category">Category</Link>
+           </li>
+           <li>
+             <Link to="/products">Products</Link>
+           </li>
+         </ul>
+       </nav>
+       {/*  Route components are rendered if the path prop matches the current URL  */}
+       <Routes>
+         <Route path="/" element={<Home />} />
+         <Route path="/category" element={<Category />} />
+         <Route path="/products" element={<Products />} />
+       </Routes>
+     </div>
+   </>
+ );
+};
+export default App;
+
+
+                            //////////////////RouterHooks///////////////////
+import { useEffect, useState } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import './App.css';
+
+const Home = () => {
+ const navigate = useNavigate();
+ return (
+   <div>
+     <h1>
+       Home page
+     </h1>
+     {/*
+     When we click this button the navigate function will change the url to
+     `/profile` and render the profile component
+      */}
+     <button onClick={() => navigate('/profile')}>Navigate to Profile </button>
+   </div>
+ )
+}
+const Profile = () => {
+ const navigate = useNavigate();
+ const [timer, setTimer] = useState(0)
+ useEffect(() => {
+   setInterval(() => {
+     setTimer(timer + 1)
+   }, 1000);
+ })
+ /*
+ After the 5 second the function navigate will change the url into `/`
+ and the home page will be rendered
+ */
+ useEffect(() => {
+   setTimeout(() => {
+     navigate('/')
+   }, 5000);
+ }, [])
+ return (
+   <div>
+     <h1>Profile Page</h1>
+     <p>
+       Count down: <span>{timer}</span>
+     </p>
+   </div>
+ )
+}
+function App() {
+ return (
+   <div className="App">
+     <Routes>
+       <Route path='/' element={<Home />}></Route>
+       <Route index path='/profile' element={<Profile />}></Route>
+     </Routes>
+   </div>
+ );
+}
+
+export default App;
+useLocation : This hook returns the location object used by the react-router. This object represents the current URL and is immutable.
+ Whenever the URL changes, the useLocation() hook returns a newly updated location object. Some of its use includes extracting the query parameters from the URL
+In the example below, we create a new route about where the element to render is the About page
+
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+const About = () => {
+   const location = useLocation()
+   useEffect(() => {
+       console.log("🚀 ~ file: About.js ~ line 5 ~ About ~ history", location)
+
+   }, [])
+   return (
+       <div>
+           <h1>
+               About Page
+           </h1>
+       </div>
+   )
+}
+
+export default About
+
+                    ///////////////EXEMPLE2/////////////////
+Let’s have an example to make it more clear.
+
+import { useEffect } from 'react';
+import { Route, Routes, useMatch, useNavigate } from 'react-router-dom';
+import './App.css';
+
+const Home = () => {
+ const navigate = useNavigate();
+ return (
+   <div>
+     <h1>
+       Home page
+     </h1>
+     <button onClick={() => navigate('/profile/John')}>Navigate to Profile </button>
+   </div>
+ )
+}
+const Profile = () => {
+ const match = useMatch('/profile/:name');
+ useEffect(() => {
+   console.log("🚀 ~ file: App.js ~ line 23 ~ Profile ~ params", match)
+
+ })
+ return (
+   <div>
+     <h1>Profile Page</h1>
+     <p>
+       this page is for {match.params.name}
+     </p>
+   </div>
+ )
+}
+function App() {
+ return (
+   <div className="App">
+     <Routes>
+       <Route path='/' element={<Home />}></Route>
+       <Route index path='/profile/:name' element={<Profile />}></Route>
+     </Routes>
+   </div>
+ );
+}
+
+export default App;
+
+
+
+
+                /////////////////The Nested routes////////////////
+Up to this point, we have been working with routers that are small enough to be rendered entirely in a single file. But as an application grows in scope, 
+it can be useful to split up the router and write Routes nearer to where the related UI logic is written.
+In other words, the nested routes allow us to, at the route level, have a parent component control the rendering of a child component.
+
+The best example here is facebook.com/messages/<whatever_path>
+If we open the facebook/messages and navigate between messages we’ll notice that the first part of the url ( facebook.com/messages/t/ ) is 
+always fixed which we call the parent path while the rest of the url is called the child path.
+
+The react router V6 library offer two way to implement the nested routes.
+The first way is to use the <Route> component and /* in the path.
+To make it easier to understand let’s have an example.
+
+import { Link, Route, Routes } from 'react-router-dom';
+import './App.css';
+// Component Home
+const Home = () => (
+ <>
+   <h1>
+     Home
+   </h1>
+ </>
+)
+// Component Profile
+const Profile = () => (
+ <>
+   <h1>
+     profile
+   </h1>
+ </>
+)
+// Component Account
+const Account = () => (
+ <>
+   <h1>
+     Account
+   </h1>
+ </>
+)
+// Component User
+const User = () => {
+ return (
+   <div>
+     <h1>User</h1>
+
+     <nav>
+       <Link to="profile">Profile</Link>
+       <Link to="account">Account</Link>
+     </nav>
+     <Routes>
+       <Route path="profile" element={<Profile />} />
+       <Route path="account" element={<Account />} />
+     </Routes>
+   </div>
+ );
+};
+const App = () => {
+ return (
+   <div className="App">
+     <>
+       <h1>React Router</h1>
+
+       <nav>
+         <Link to="/home">Home</Link>
+         <Link to="/user">User</Link>
+       </nav>
+
+       <Routes>
+         <Route index element={<Home />} />
+         <Route path="home" element={<Home />} />
+         {/* The `/*` means every route that is relative to the user must render the user component   */}
+         <Route path="/user/*" element={<User />}>
+         </Route>
+       </Routes>
+     </>
+   </div>
+ );
+}
+
+export default App;
+
+                ///////////////////Nested Routes with outlet///////////////////////////
+The <Outlet> element is used as a placeholder. In this case an <Outlet>enables the Users component to render its child routes.
+Thus the<Outlet> element will render either a <Profile> or <Account> element depending on the current location.
+Let’s see the same example as before with outlet:
+
+import { Link, Outlet, Route, Routes } from 'react-router-dom';
+import './App.css';
+// Component Home
+const Home = () => (
+ <>
+   <h1>
+     Home
+   </h1>
+ </>
+)
+// Component Profile
+const Profile = () => (
+ <>
+   <h1>
+     profile
+   </h1>
+ </>
+)
+// Component Account
+const Account = () => (
+ <>
+   <h1>
+     Account
+   </h1>
+ </>
+)
+// Component User
+const User = () => {
+ return (
+   <div>
+     <h1>User</h1>
+
+     <nav>
+       <Link to="profile">Profile</Link>
+       <Link to="account">Account</Link>
+     </nav>
+     <div>
+       {/*
+       This outlet will serve as a placeholder
+       until the nested component will be rendered
+        */}
+       <Outlet />
+     </div>
+   </div>
+ );
+};
+const App = () => {
+ return (
+   <div className="App">
+     <>
+       <h1>React Router</h1>
+
+       <nav>
+         <Link to="/home">Home</Link>
+         <Link to="/user">User</Link>
+       </nav>
+
+       <Routes>
+         <Route index element={<Home />} />
+         <Route path="home" element={<Home />} />
+         {/* The `/*` means every route that is relative to the user must render the user component   */}
+         <Route path="user" element={<User />}>
+           <Route path="profile" element={<Profile />} />
+           <Route path="account" element={<Account />} />
+         </Route>
+       </Routes>
+     </>
+   </div>
+ );
+}
+
+export default App;
+
+                                //////////The PrivateRoute component///////////////////
+Now let’s create the rest our application. In this example we are going to implement them in the same file ( but you have to implement each component in a separate file)
+
+import { Link, Route, Routes } from "react-router-dom";
+import PrivateRoute from "./Components/PrivateRoute";
+
+const Home = () => <h1>Home (Public)</h1>;
+const Pricing = () => <h1>Pricing (Public)</h1>;
+const Dashboard = () => <h1>Dashboard (Private)</h1>;
+const Settings = () => <h1>Settings (Private)</h1>;
+
+const Login = () => <h1>TODO</h1>
+
+function Nav() {
+ return (
+   <nav>
+
+     <Link to="/">Home</Link>
+     {` `}
+     <Link to="/pricing">Pricing</Link>
+
+   </nav>
+ );
+}
+
+export default function App() {
+ return (
+   <div>
+     <Nav />
+
+     <Routes>
+       <Route path="/" element={<Home />} />
+       <Route path="/pricing" element={<Pricing />} />
+       <Route path="/dashboard" element={
+         <PrivateRoute >
+           <Dashboard />
+         </PrivateRoute>
+       } />
+       <Route path="/settings" element={
+         <PrivateRoute isAuth={false}>
+           < Settings />
+         </PrivateRoute>
+
+       } />
+       <Route path="/login" element={<Login />} />
+     </Routes>
+   </div>
+ );
+}
